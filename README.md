@@ -125,9 +125,7 @@ To test the system, execute:
 
 ## License
 
-Copyright © 2015-2016 Terje Norderhaug
-
-Based on an app concept by Marian Schubert.
+Copyright © 2018 Terje Norderhaug
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
