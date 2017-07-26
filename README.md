@@ -3,21 +3,9 @@
 Collaborative Continuous Care of patients on Cisco Spark via Facebook Messenger
 aided by Infermedica.
 
-## Requirements
-
-leiningen, heroku, npm
-
-## Run Locally
-
-To start a server on your own computer:
-
-    lein do clean, deps, compile
-    lein run
-
-Point your browser to the displayed local port.
-Click on the displayed text to refresh.
-
 ## Deploy to Heroku
+
+Requirements: git, heroku cli.
 
 To start a server on Heroku:
 
@@ -88,6 +76,17 @@ Set the environment vars below using:
     CISCOSPARK_PATIENT_USERID
     FACEBOOK_ACCESS_TOKEN
 
+## Run Locally
+
+Requirements: leiningen, node, npm
+
+To start a server on your own computer:
+
+    lein do clean, deps, compile
+    lein run
+
+Point your browser to the displayed local port.
+
 ## Local Testing
 
 For development purposes, a staging server on Heroku can optionally forward
@@ -102,7 +101,6 @@ local computer, using a command like this in the Terminal:
 To disable the redirect, set the system var to nothing:
 
     heroku config:set REDIRECT=
-
 
 ## Development Workflow
 
