@@ -7,16 +7,6 @@ aided by Infermedica.
 
 Requirements: git, heroku cli.
 
-To start a server on Heroku:
-
-    heroku apps:create
-    git push heroku master
-    heroku open
-
-This will open the site in your browser.
-
-## Cisco Spark setup
-
 From the terminal on your computer, clone the cococare distribution:
 
     git clone https://githib.com/terjenorderhaug/cococare
@@ -32,6 +22,9 @@ Verify by opening the app homepage in a browser by executing:
     heroku open
 
 Note the URL for later use in the configuration.
+
+## Cisco Spark setup
+
 
 - Sign up for Cisco Spark developer account: https://developer.ciscospark.com
 - Review the bot setup page: https://developer.ciscospark.com/bots.html
