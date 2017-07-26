@@ -38,19 +38,6 @@ Execute in terminal to set a CISCOSPARK_ACCESS_TOKEN environment var for the tok
 
     heroku config:set CISCOSPARK_ACCESS_TOKEN=xxxx
 
-In the project directory execute in terminal:
-
-    touch .env
-    heroku config >> .env
-
-Start server locally:
-
-    heroku local
-
-Testing, start e.g. ngrok for local dev:
-
-    ngrok http 5000
-
 - Review the Webhooks guide at: https://developer.ciscospark.com/webhooks-explained.html
 
 ## ENVIRONMENT
@@ -89,12 +76,25 @@ For development purposes, a staging server on Heroku can optionally forward
 incoming webhooks to ngrok. That way you can test on your local machine without
 having to reconfigure the webhooks on facebook and cisco spark.
 
-Set the system var REDIRECT to the url provided when running ngrok on your
+In the project directory execute in terminal to set up the local environment:
+
+    touch .env
+    heroku config >> .env
+
+For testing, start e.g. ngrok for local dev:
+
+    ngrok http 5000
+
+Set the heroku system var REDIRECT to the url provided when running ngrok on your
 local computer, using a command like this in the Terminal:
 
     heroku config:set REDIRECT=https://f1f362f1.ngrok.io
 
-To disable the redirect, set the system var to nothing:
+Start server locally:
+
+    heroku local web
+
+Afterwards, disable the redirect by setting the system var to blank:
 
     heroku config:set REDIRECT=
 
