@@ -75,6 +75,9 @@ Set the environment vars below using:
     CISCOSPARK_PATIENT_TOKEN
     CISCOSPARK_PATIENT_USERID
     FACEBOOK_ACCESS_TOKEN
+    # Optional:
+    INFERMEDICA_APP_ID
+    INFERMEDICA_APP_KEY
 
 ## Run Locally
 
