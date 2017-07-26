@@ -53,11 +53,9 @@ Note the URL for later use in the configuration.
   and "http://www.predictablywell.com/media/Predictably_Well_4Cvector_LogoOnly.png" as URL (upload and suggest something else)
 - Save the changes and Make a copy of the access token on the resulting page
 
-Execute in terminal to set a CISCOSPARKTOKEN environment var for the token on heroku:
+Execute in terminal to set a CISCOSPARK_ACCESS_TOKEN environment var for the token on heroku:
 
-    heroku config:set CISCOSPARKTOKEN=xxxx
-
-[should be CISCOSPARK_ACCESS_TOKEN instead???]
+    heroku config:set CISCOSPARK_ACCESS_TOKEN=xxxx
 
 In the project directory execute in terminal:
 
@@ -73,6 +71,22 @@ Testing, start e.g. ngrok for local dev:
     ngrok http 5000
 
 - Review the Webhooks guide at: https://developer.ciscospark.com/webhooks-explained.html
+
+## ENVIRONMENT
+
+Set the environment vars below using:
+
+    heroku config:set var=value
+
+    CISCOSPARK_ACCESS_TOKEN
+    CISCOSPARK_CLIENT_ID
+    CISCOSPARK_CLIENT_SECRET
+    CISCOSPARK_SCOPE="spark:all spark-admin:roles_read spark-admin:people_write spark-admin:organizations_read spark:kms spark-admin:people_read spark-admin:licenses_read"
+    CISCOSPARK_REDIRECT_URI="http://cococare.herokuapp.com/ciscospark/authorize"
+    CISCOSPARK_USER_TOKEN
+    CISCOSPARK_PATIENT_TOKEN
+    CISCOSPARK_PATIENT_USERID
+    FACEBOOK_ACCESS_TOKEN
 
 ## Local Testing
 
