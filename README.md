@@ -40,6 +40,17 @@ Execute in terminal to set a CISCOSPARK_ACCESS_TOKEN environment var for the tok
 
 - Review the Webhooks guide at: https://developer.ciscospark.com/webhooks-explained.html
 
+## Facebook Messenger Setup
+
+Create a page on Facebook for your service.
+
+Open a developer account on https://developers.facebook.com
+
+Create a webhook to handle messages for the page.
+See https://developers.facebook.com/docs/messenger-platform/webhook-reference
+
+Configure the facebook webhook for the page to point to `/facebook/webhook` on your heroku server.
+
 ## ENVIRONMENT
 
 Set the environment vars below using:
