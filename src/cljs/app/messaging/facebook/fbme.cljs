@@ -6,23 +6,20 @@
        :refer [chan <! >! put! close! timeout]]
     [taoensso.timbre :as timbre]))
 
-(def secret-facebook-token "hey this is a big secret that has leaked out") ;; used as verify token when setting up webhook
-
-(defn express-get-handler []
-   ; see https://developers.facebook.com/docs/messenger-platform/guides/quick-start
+(defn express-get-handler [{:keys [facebook-token]}]
+  ; see https://developers.facebook.com/docs/messenger-platform/guides/quick-start
   (fn [req res]
-   (let [query (js->clj (.-query req))
-         mode (get query "hub.mode")
-         check-token #(assert (= secret-facebook-token
-                                 (get query "hub.verify_token")))]
-     (timbre/info "[FLAREBOT] GET:" query (js->clj req))
-     (case mode
-       "subscribe" (do (check-token)
-                       (timbre/debug "Validated webhook")
-                       (.send res (get query "hub.challenge")))
-       (do (timbre/error "Failed validation. Make sure the validation tokens match. mode:" mode)
-           (.sendStatus res 403))))))
-
+    (let [query (js->clj (.-query req))
+          mode (get query "hub.mode")
+          check-token #(assert (= facebook-token
+                                  (get query "hub.verify_token")))]
+      (timbre/info "[FLAREBOT] GET:" query (js->clj req))
+      (case mode
+        "subscribe" (do (check-token)
+                      (timbre/debug "Validated webhook")
+                      (.send res (get query "hub.challenge")))
+        (do (timbre/error "Failed validation. Make sure the validation tokens match. mode:" mode)
+          (.sendStatus res 403))))))
 
 (defn express-post-handler [& [message-handler]]
   ; see https://developers.facebook.com/docs/messenger-platform/guides/quick-start
@@ -47,3 +44,22 @@
       (timbre/warn "[FLAREBOT] unknown object "
                    (js->clj object)))
     (.sendStatus res 200))))
+
+(defn fetch-user-id
+      "get id to identify and authenticate the user and personalize the resulting experience"
+      ;; https://developers.facebook.com/docs/messenger-platform/webview/userid
+      ([] (fetch-user-id println))
+      ([report]
+       (let [out (chan)
+             extract #(.-psid ^js/Facebook.Messenger %)]
+         (.getUserID ^js/Facebook.Messenger js/MessengerExtensions
+                     (fn success [uids]
+                       (try
+                         (put! out (extract uids))
+                         (catch :default e
+                           (report "Error:" (pr-str e))))
+                       (close! out))
+                     (fn [err]
+                       (timbre/error err)
+                       (close! out)))
+         out)))

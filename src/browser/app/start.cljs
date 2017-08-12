@@ -1,13 +1,18 @@
 (ns app.start
   (:require
    [app.core :as app]
-   [app.session :as session]
-   [app.routes :as routes]))
+   [app.routing :as routing]))
 
 (enable-console-print!)
 
 (defn ^:export main []
-  (app/activate session/dispatcher)
-  (routes/hook-browser-navigation!))
+  (app/activate)
+  (routing/hook-browser-navigation!))
+
+(defn loaded-messenger-extensions [& args]
+  nil)
+
+(set! js/loaded_messenger_extensions_sdk
+      loaded-messenger-extensions)
 
 (set! js/main-cljs-fn main)

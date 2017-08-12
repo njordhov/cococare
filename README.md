@@ -1,23 +1,27 @@
 # CoCoCare
 
-Collaborative Continuous Care of patients on Cisco Spark via Facebook Messenger
-aided by Infermedica.
+Cisco Spark based Collaborative Continuous Care of patients on Facebook Messenger, augmented by a chatbot with medical information from Infermedica.
 
 ## Deploy to Heroku
 
-Requirements: git, heroku cli.
+Requirements: git, [heroku cli](https://heroku.com).
 
 From the terminal on your computer, clone the cococare distribution:
 
-    git clone https://githib.com/terjenorderhaug/cococare
+    git clone https://github.com/terjenorderhaug/cococare
     cd cococare
 
-Assuming you already have an account on https://heroku.com build a new app from the distribution from the command line:
+Set the optional Node environment vars:
+
+    heroku config:set NODEJS_VERSION=7.4.0
+    heroku config:set NODE_TLS_REJECT_UNAUTHORIZED=0
+
+ Build a new app from the distribution:
 
     heroku apps:create
     git push heroku master
 
-Verify by opening the app homepage in a browser by executing:
+Verify by opening the app homepage in a browser:
 
     heroku open
 
@@ -25,50 +29,142 @@ Note the URL for later use in the configuration.
 
 ## Cisco Spark setup
 
+You will create a new Team in Cisco Spark that creates spaces to communicate with patients on Facebook Messenger, augmented with medical information and analysis from the CoCo bot.
 
-- Sign up for Cisco Spark developer account: https://developer.ciscospark.com
+- In the Cisco Spark application, create a new team called CoCoCare.
+- Sign up for a Cisco Spark developer account from https://developer.ciscospark.com
+- Specify your access token from the Cisco Spark account:
+
+    heroku config:set CISCOSPARK_ACCESS_TOKEN=
+
+### CoCoCare Integration
+
+The CoCoCare integration creates a Spark space for each patient as they engage from Facebook.
+
+- Create an integration called CoCoCare from the Cisco Spark developer interface.
+- Optionally use the icon http://cococare.herokuapp.com/CoCoCare_mini.png
+- For redirect URI use http://cococare.herokuapp.com/ciscospark/authorize
+with the hostname of your own app in place of cococare.herokuapp.com.
+- For Scopes check *all*.
+- Use the values under OAuth Setting to set these config vars on heroku:
+
+    heroku config:set CISCOSPARK_CLIENT_ID
+    heroku config:set CISCOSPARK_CLIENT_SECRET
+
+### CoCo Bot
+
+The CoCo bot post administrative messages in the Spark spaces.
+
 - Review the bot setup page: https://developer.ciscospark.com/bots.html
 - Go to Add App: https://developer.ciscospark.com/add-app.html
 - Create a bot with Display Name "CoCo",
   username "cocoX" where X is a number or a unique custom term,
-  and "http://www.predictablywell.com/media/Predictably_Well_4Cvector_LogoOnly.png" as URL (upload and suggest something else)
+  and "http://www.predictablywell.com/media/Predictably_Well_4Cvector_LogoOnly.png" as icon URL
 - Save the changes and Make a copy of the access token on the resulting page
 
-Execute in terminal to set a CISCOSPARK_ACCESS_TOKEN environment var for the token on heroku:
+- On the CoCoCare Team page in the Cisco Spark application, add the access token for the coco bot:
 
-    heroku config:set CISCOSPARK_ACCESS_TOKEN=xxxx
+    heroku config:set CISCOSPARK_BOT_TOKEN=
 
-- Review the Webhooks guide at: https://developer.ciscospark.com/webhooks-explained.html
+### Patient Bot
+
+The Patient bot redirects messages from the patient into the Spark space
+of each patient.
+
+- Create a bot with display name “Patient” and add its values to the environment:
+
+    heroku config:set CISCOSPARK_PATIENT_TOKEN=
+    heroku config:set CISCOSPARK_PATIENT_USERID=
+
+### Webhook
+
+Review the Cisco Spark [Webhooks guide](https://developer.ciscospark.com/webhooks-explained.html).
+
+- Create a webhook using the Test Mode of the
+Developer page at (https://developer.ciscospark.com/endpoint-webhooks-post.html)
+with targetURL set to a custom version of this URL:
+
+    https://cococare.herokuapp.com/ciscospark/webhook
+
+Make it a firehose by setting `event` and `resource` to "all".
 
 ## Facebook Messenger Setup
 
-Create a page on Facebook for your service.
+- Create a page on Facebook for your service.
 
-Open a developer account on https://developers.facebook.com
+From your [Facebook developer account](https://developers.facebook.com):
 
-Create a webhook to handle messages for the page.
-See https://developers.facebook.com/docs/messenger-platform/webhook-reference
+- Create a new app and open its configuration page, then:
 
-Configure the facebook webhook for the page to point to `/facebook/webhook` on your heroku server.
+### Configuring Messenger
 
-## ENVIRONMENT
+- Under *Products* on the sidebar, add **Messenger** as product.
+- Under *Token Generation* select the created facebook page.
+- Add the new access token as an environment var for the server:
 
-Set the environment vars below using:
+    heroku config:set FACEBOOK_ACCESS_TOKEN=xxxxxx
 
-    heroku config:set var=value
+- Under *Webhooks* edit the events to enable "messages" only.
+- Select the page as subscriber to webhook events.
 
-    CISCOSPARK_ACCESS_TOKEN
-    CISCOSPARK_CLIENT_ID
-    CISCOSPARK_CLIENT_SECRET
-    CISCOSPARK_SCOPE="spark:all spark-admin:roles_read spark-admin:people_write spark-admin:organizations_read spark:kms spark-admin:people_read spark-admin:licenses_read"
-    CISCOSPARK_REDIRECT_URI="http://cococare.herokuapp.com/ciscospark/authorize"
-    CISCOSPARK_USER_TOKEN
-    CISCOSPARK_PATIENT_TOKEN
-    CISCOSPARK_PATIENT_USERID
-    FACEBOOK_ACCESS_TOKEN
-    # Optional:
-    INFERMEDICA_APP_ID
-    INFERMEDICA_APP_KEY
+- Enable *Built-in NLP* which provides language analysis from [wit.ai](https://wit.ai)
+
+- Under *App Review* Select `pages_messaging` and `pages_messaging_subscriptions` then submit for review. Note: You may have to update the facebook page as requested.
+
+### Configuring the Messenger Webhook
+
+- Add a [webhook](https://developers.facebook.com/docs/messenger-platform/webhook-reference) "product" to handle messages for the app.
+- Set the type of the webhook to `page`.
+- Make sure your app is installed on heroku and up running, as the webhook on the server will be accessed by facebook to verify it.
+- Set the facebook verify token var on the server to a string of your choice by executing in the terminal:
+
+    heroku config:set FACEBOOK_VERIFY_TOKEN="some secret text"
+
+- Configure the facebook webhook *Callback Url* to point to `https://appname.herokuapp.com/fbme/webhook` where `appname` is the name of your app on heroku.
+- If the webhook fails to be accepted by facebook, troubleshoot as needed.
+
+### Configuring the Chat Extension
+
+The Facebook chat extension provides a menu and view within Messenger. CoCoCare uses this to provide an interactive dialog in Messenger for patients to check-in with their symptoms.
+
+Start a repl on heroku to execute configuration commands:
+
+    heroku run lein repl
+
+- Evaluate to provide configuration commands:
+
+    (in-ns 'app.messaging.facebook.messenger)
+
+- Whitelist the domain of the server:
+
+    (send-whitelist-domains ["https://appname.herokuapp.com/"])
+
+- To create a messenger extension link in the facebook messenger drawer, using the name of your own app, evaluate:
+
+    (send-home-url {:url "https://appname.herokuapp.com/#checkin"
+                    :webview_height_ratio "tall"
+                    :in_test "true"})
+
+- Enable a Getting Started button in Messenger:
+
+    (send-get-started {:payload "START"})
+
+- Set up a menu in Messenger:
+
+    (send-persistent-menu
+         [{:locale "default"
+           :call_to_actions
+           [(url-button "Check In"
+                        :messenger-extensions true
+                        :url "https://appname.herokuapp.com/#checkin"
+                        :webview-height-ratio "compact")]}])
+
+## InferMedica Setup (optional)
+
+Infermedica provides an API to parse natural language for medical concepts. Register with [InferMedica](https://developer.infermedica.com/) to get an app id and key.
+
+    heroku config:set INFERMEDICA_APP_ID=
+    heroku config:set INFERMEDICA_APP_KEY=
 
 ## Run Locally
 
@@ -80,34 +176,6 @@ To start a server on your own computer:
     lein run
 
 Point your browser to the displayed local port.
-
-## Local Testing
-
-For development purposes, a staging server on Heroku can optionally forward
-incoming webhooks to ngrok. That way you can test on your local machine without
-having to reconfigure the webhooks on facebook and cisco spark.
-
-In the project directory execute in terminal to set up the local environment:
-
-    touch .env
-    heroku config >> .env
-
-For testing, start e.g. ngrok for local dev:
-
-    ngrok http 5000
-
-Set the heroku system var REDIRECT to the url provided when running ngrok on your
-local computer, using a command like this in the Terminal:
-
-    heroku config:set REDIRECT=https://f1f362f1.ngrok.io
-
-Start server locally:
-
-    heroku local web
-
-Afterwards, disable the redirect by setting the system var to blank:
-
-    heroku config:set REDIRECT=
 
 ## Development Workflow
 
@@ -128,9 +196,36 @@ To test the system, execute:
 
     lein test
 
+## Local Testing
+
+For development purposes, a staging server on Heroku can optionally forward
+incoming webhooks to ngrok. That way you can test on your local machine without having to reconfigure the webhooks on facebook and cisco spark.
+
+In the project directory execute in terminal to set up the local environment:
+
+    touch .env
+    heroku config >> .env
+
+For testing, start e.g. ngrok for local dev:
+
+    ngrok http 5000
+
+Set the heroku system var REDIRECT to the url provided when running ngrok on your
+local computer, using a command like this in the Terminal:
+
+    heroku config:set REDIRECT=https://f1f362f1.ngrok.io
+
+Start server locally:
+
+    heroku local web
+
+Afterwards, disable the redirect:
+
+    heroku config:remove REDIRECT
+
 ## License
 
-Copyright © 2018 Terje Norderhaug
+Copyright © 2017 Terje Norderhaug
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.

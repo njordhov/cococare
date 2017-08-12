@@ -25,22 +25,19 @@
 
 (def body-parser (nodejs/require "body-parser"))
 
+(def ^{:doc "used as verify token when setting up webhooksecret-facebook-token"}
+     secret-facebook-token
+    (aget js/process "env" "FACEBOOK_VERIFY_TOKEN"))
+
+(when-not secret-facebook-token
+  (timbre/warn "Need to set the FACEBOOK_VERIFY_TOKEN environment var"))
+
 (defn handler [req res]
   (if (= "https" (aget (.-headers req) "x-forwarded-proto"))
     (.redirect res (str "http://" (.get req "Host") (.-url req)))
     (go
       (.set res "Content-Type" "text/html")
       (.send res (<! (static-page))))))
-
-(defn api-handler [req res]
-  (go-loop [in (app/resource-chan)
-            [val ch] (alts! [in (timeout 5000)])]
-    (if (identical? in ch)
-      (do
-        (.set res "Content-Type" "application/json")
-        (.send res (clj->js val)))
-      (do
-        (.send (.status res 504) "Gateway Timeout")))))
 
 (defn debug-redirect [req res]
    (let [local (aget js/process "env" "REDIRECT")]
@@ -55,19 +52,17 @@
     (or (debug-redirect req res)
         (handler req res))))
 
-;; (db/store "Terje Norderhaug" "1787731634602278")
-
 (defn ciscospark-webhook [req res]
   (timbre/debug "CISCOSPARK WEBHOOK" (.keys js/Object req) (js->clj req))
   (let [body (.-body req)
         resource (.-resource body)
         data (.-data body)
         id (.-id data)]
-    (timbre/debug "->" (.keys js/Object data) (js->clj body))
+    (timbre/debug "PROCESS:" (js->clj body) (.keys js/Object data))
     (case resource
       "messages"
       (go-loop [{:keys [text roomId personId personEmail] :as msg}
-                (<! (spark/fetch-message2 {:id id :token spark/user-token}))]
+                (<! (spark/fetch-message2 {:id id :token spark/access-token}))]
         (timbre/debug "SPARK MSG:" msg)
         (if-let [fb-target (db/retrieve roomId)]
           (when-not (#{"patient@sparkbot.io"} personEmail)
@@ -88,8 +83,8 @@
                  #js {:extended false}))
     (.use (.json body-parser))
     (.get "/" handler)
-    (.get "/api" api-handler)
-    (.get "/fbme/webhook" (fbme/express-get-handler))
+    (.get "/fbme/webhook" (fbme/express-get-handler
+                           {:facebook-token secret-facebook-token}))
     (.post "/fbme/webhook" (wrap-intercept fbhook/fbme-handler))
     (.get "/ciscospark/webhook" (wrap-intercept ciscospark-webhook))
     (.post "/ciscospark/webhook" (wrap-intercept ciscospark-webhook))

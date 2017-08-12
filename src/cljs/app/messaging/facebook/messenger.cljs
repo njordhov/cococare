@@ -7,8 +7,10 @@
    [clojure.spec.alpha :as s]
    [taoensso.timbre :as timbre]
    [goog.net.XhrIo :as xhr]
-   [camel-snake-kebab.core :refer [->snake_case_keyword ->kebab-case-keyword]]
-   [camel-snake-kebab.extras :refer [transform-keys]]))
+   [camel-snake-kebab.core
+    :refer [->snake_case_keyword ->kebab-case-keyword]]
+   [camel-snake-kebab.extras
+    :refer [transform-keys]]))
 
 ;;    Docs:
 ;;    https://developers.facebook.com/docs/messenger-platform/send-api-reference
@@ -45,20 +47,6 @@
                       (s/or
                        :postback (s/keys :req-un [::postback])
                        :any (s/keys :opt-un []))))
-
-#_
-(def postback-xmp {:sender {:id "USER_ID"}
-                   :recipient {:id "PAGE_ID"}
-                   :timestamp 1458692752478
-                   :postback {:payload 'USER_DEFINED_PAYLOAD
-                              :referral {:ref 'USER_DEFINED_REFERRAL_PARAM
-                                         :source "SHORTLINK"
-                                         :type "OPEN_THREAD"}}})
-
-#_
-(s/valid? ::event postback-xmp)
-#_
-(s/describe ::event)
 
 ;; --------------------------------------
 ;; REQUEST
@@ -433,8 +421,6 @@
   ([{:keys [payload] :as get-started}]
    (post-profile :get_started get-started)))
 
-(def get-started-payload "START") ;; need to post-profile below on changes
-
 (defn fetch-user-profile [id]
   ; first_name,last_name,profile_pic,locale,timezone,gender
   (api-get (str fb-endpoint id "?access_token=" fb-access-secret) true))
@@ -448,6 +434,12 @@
       (set-message-text (or (get-in event [:message :text])
                             (get-in event [:message :message :text])))
       (send)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PERSISTENT MENU
+
+(defn send-persistent-menu [[:as menu-items]]
+  (post-profile :persistent_menu menu-items))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GREETING

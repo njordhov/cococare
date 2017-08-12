@@ -18,6 +18,7 @@ but that doesn't seem to be the case, which may require additional concerns.
 (println "> Loading polyfill.compat")
 
 ;; required for recharts only (still relevant?
+#_
 (when-not (exists? js/ReactDOMServer)
   (let [react-dom-server (nodejs/require "react-dom/server")]
     ;; ReactDOMServer is now assigned in react-dom/server so this is for compatibility
@@ -358,3 +359,5 @@ but that doesn't seem to be the case, which may require additional concerns.
 ; Soon we should be able to use jsdom instead for more comprehensive browser dom emulation:
 ; (def jsdom (nodejs/require "jsdom"))
 ; (set! js/document (jsdom/jsdom "<p></p>" #js {}))
+
+(println "> Loaded polyfill.compat")

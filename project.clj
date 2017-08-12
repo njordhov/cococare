@@ -1,5 +1,5 @@
-(defproject cljsnode "0.1.1-SNAPSHOT"
-  :description "FIXME: write description"
+(defproject cococare "0.1.2-SNAPSHOT"
+  :description "Collaborative Continous Care"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -8,11 +8,16 @@
                  [org.clojure/clojurescript "1.9.562"]
                  [org.clojure/core.async "0.3.443"]
                  [reagent "0.7.0"]
+                 [re-frame "0.9.4"]
                  [secretary "1.2.3"]
-                 [kioo "0.5.0-SNAPSHOT" :exclusions [cljsjs/react]]
+                 [kioo "0.5.0-SNAPSHOT"
+                  :exclusions [cljsjs/react]]
                  [com.taoensso/timbre "4.10.0"]
                  [cljs-http "0.1.43"]
-                 [camel-snake-kebab "0.4.0"]]
+                 [camel-snake-kebab "0.4.0"]
+                 [cljsjs/material-ui "0.18.1-0"]
+                 [cljs-react-material-ui "0.2.44"
+                  :exclusions [cljsjs/material-ui cljsjs/react cljsjs/react-dom]]]
 
   :npm {:dependencies [[express "4.14.1"]
                        [express-ws "2.0.0"]
@@ -52,7 +57,6 @@
                            :output-dir "resources/public/js/out"
                            :asset-path "js/out"
                            :main app.start
-                           :foreign-libs []
                            :infer-externs true
                            :optimizations :none}}
                :server
@@ -66,7 +70,7 @@
 
   :profiles {:dev
              {:plugins
-              [[lein-figwheel "0.5.10"] ;; was "0.5.4-7"
+              [[lein-figwheel "0.5.10"]
                [lein-doo "0.1.7"]]
               :dependencies
               [[figwheel-sidecar "0.5.10"]
@@ -119,11 +123,11 @@
               :cljsbuild
               {:builds
                {:server
-                {:compiler {}};:optimizations :simple
+                {:compiler {;:optimizations :simple
                             ;; likely optional unless :simple
                             ;:foreign-libs [{:file "src/node/polyfill/simple.js"
                             ;                :provides ["polyfill.simple"]
-                            ;:pretty-print false}}
+                            :pretty-print false}}
                 :app
                 {:compiler {:output-dir "target/app/out"
                             :optimizations :advanced

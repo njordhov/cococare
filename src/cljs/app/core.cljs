@@ -7,46 +7,41 @@
     :refer [<! chan close! alts! timeout put!]]
    [goog.dom :as dom]
    [goog.events :as events]
+   [taoensso.timbre :as timbre]
    [reagent.core :as reagent
     :refer [atom]]
+   [re-frame.core :as rf]
    [reagent.dom.server
     :refer [render-to-string]]
-   [app.bridge :as bridge]
-   [app.views
+   [app.state :as state]
+   [app.view.views
     :refer [view page html5]]))
+
+(enable-console-print!)
 
 (def scripts [{:src "/js/out/app.js"}
               "main_cljs_fn()"])
 
-(def endpoint {:url "http://api.icndb.com/jokes/random"
-               :extract #(get-in % ["value" "joke"])})
-
-(def resource-chan
-  (memoize #(bridge/open-resource endpoint 12 2)))
+(def logo
+  [:div.logo "c"])
 
 (defn static-page []
-  (let [out (chan 1)
-        in (resource-chan)]
-    (go
-      (let [[val ch] (alts! [in (timeout 2000)])]
+    (let [out (chan 1)
+          state {}]
+        (timbre/debug "[STATIC]" state)
         (put! out
-              (-> (if (identical? in ch) val (repeat 12 "No Joke!"))
-                  (page :scripts scripts :title "Jokes" :forkme true)
-                  (render-to-string)
-                  (html5)))))
-    out))
+              (->  state
+                   (page :scripts scripts
+                         :title [:span logo "CoCoCare Check-In"]
+                         :forkme false)
+                   (render-to-string)
+                   (html5)))
+        out))
 
-(defn activate [dispatcher]
+(defn activate []
+  (timbre/debug "[ACTIVATE]")
+  (state/init)
   (let [el (dom/getElement "canvas")
-        buf-num 12
-        buf-size 3
-        in (bridge/open-resource endpoint buf-num buf-size :concur (* buf-num buf-size))
-        content (atom nil)]
-    (go-loop []
-      (when-let [event (<! dispatcher)]
-        (case (first event)
-          :refresh (let [initialize (nil? @content)]
-                     (reset! content (<! in))
-                     (when initialize
-                       (reagent/render [#(view @content)] el))))
-        (recur)))))
+        mode (rf/subscribe [:page])
+        state (rf/subscribe [:state])]
+    (reagent/render [#(view @mode @state)] el)))

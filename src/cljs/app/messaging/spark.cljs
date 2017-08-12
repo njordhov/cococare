@@ -16,10 +16,7 @@
 
 (def client-secret (aget js/process "env" "CISCOSPARK_CLIENT_SECRET"))
 
-(def access-token (aget js/process "env" "CISCOSPARK_ACCESS_TOKEN")) ;; for coco bot
-
-; taken from the spark developer api website
-(def user-token (aget js/process "env" "CISCOSPARK_USER_TOKEN"))
+(def access-token (aget js/process "env" "CISCOSPARK_ACCESS_TOKEN"))
 
 (def spark
   (memoize
@@ -61,12 +58,6 @@
              :oauth-token token
              :channel (chan 1 (map (comp :items :body)))}))
 
-#_
-(echo (fetch-webhooks {:token access-token}))
-
-#_
-(echo (fetch-webhooks {:token user-token}))
-
 (defn delete-webhook [{:keys [id token]}]
   (http/delete (endpoint "webhooks/" id)
                {:with-credentials? false
@@ -79,13 +70,6 @@
              {:with-credentials? false
               :oauth-token token
               :json-params params}))
-
-#_
-(echo (register-webhook {:token user-token}
-                        {:name "cococare1"
-                         :resource "all"
-                         :event "all"
-                         :targetUrl "https://cococare.herokuapp.com/ciscospark/webhook"}))
 
 (defn register-firehose [name token & [url]]
   (go
@@ -103,13 +87,13 @@
       (<!)))))
 
 #_
-(register-firehose "cococare" user-token)
+(register-firehose "cococare" access-token)
 
 #_
-(echo (register-firehose "cococare1" user-token
+(echo (register-firehose "cococare1" access-token
                          #_"https://cococare.herokuapp.com/ciscospark/webhook"))
 #_
-(echo (register-firehose "cococare0" user-token
+(echo (register-firehose "cococare0" access-token
                          "http://dfe8c4b6.ngrok.io/ciscospark/webhook"))
 
 (defn authorize [{:keys [redirect]}]
@@ -144,7 +128,7 @@
            :channel (chan 1 (map (comp :items :body)))}))
 
 #_
-(echo (fetch-organizations {:token user-token}))
+(echo (fetch-organizations {:token access-token}))
 
 (defn fetch-organization-details [{:keys [token id]}]
   (http/get (endpoint "organizations/" id)
@@ -152,11 +136,6 @@
            :oauth-token token
            :accept "application/json; charset=utf-8"
            :channel (chan 1 (map (comp identity)))}))
-
-#_ ; using :id from fetch-organizations
-(echo (fetch-organization-details
-       {:token user-token
-        :id "Y2lzY29zcGFyazovL3VzL09SR0FOSVpBVElPTi81OGI2Y2VmNi0zNjMxLTRhN2UtOGYyNC04OGQ0M2Q3Y2E3MTY"}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TEAMS
@@ -172,7 +151,7 @@
            :channel (chan 1 (map (comp :items :body)))}))
 
 #_
-(echo (fetch-teams {:token user-token}))
+(echo (fetch-teams {:token access-token}))
 
 ;; Provides the cococare id so we're getting there!
 (def cococare-team-id "Y2lzY29zcGFyazovL3VzL1RFQU0vZjE1ODI3ODAtNzBiNC0xMWU3LWE4ZTktMjlhMjczMWJjNmQ0")
@@ -218,22 +197,8 @@
          (.catch (error-handler out))))
     out))
 
-#_ (echo (create-room {:title "FooBar"
-                       :icon "https://51e31e4a8ecef1d0c1b6-b87aecd2c0725d38adc2e13be2674daf.ssl.cf1.rackcdn.com/V1~98b39ff299fcbdaf7ce4c19ddfef5956~Dz2G3rydSqCCw_09lQnF3g==~1600"
-                       :team-id cococare-team-id}))
-
-#_
-(def patient-room-id "Y2lzY29zcGFyazovL3VzL1JPT00vNzgwMmNiODAtNzBkYS0xMWU3LTk1MjktNDFkYzY3ZTEwMzU5")
-
-#_
-(def default-room-id "Y2lzY29zcGFyazovL3VzL1JPT00vYmVmZDljZTAtOTkzZi0xMWU2LWJjOTktZjUyYzY4ZTZjZjVh")
-;; CISCOSPARK_ACCESS_TOKEN=MzY1NWE1Y2QtZDI2OC00NjY2LWJjMzUtYjAxODI2ZDc1OGIwNDQyMjk0NGQtMmQ4
-
 (defn delete-room [{:keys [id]}]
   (http/delete (endpoint "rooms/" id)))
-
-#_
-(delete-room "Y2lzY29zcGFyazovL3VzL1JPT00vMWY5N2I2YTAtNzBkOS0xMWU3LThhMWYtZDkzMWY0ZDMzOGU2")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; messages
@@ -269,8 +234,6 @@
     out))
   ([] (fetch-message default-message-id)))
 
-#_ (echo (fetch-message "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvMDQyNDcwYTAtNzEwZC0xMWU3LWE2MjktODU3ZmYyMWQzYzQ5"))
-
 (defn fetch-message2
   [{:keys [id token]}]
   (http/get (endpoint "messages/" id)
@@ -278,10 +241,6 @@
            :oauth-token token
            :accept "application/json; charset=utf-8"
            :channel (chan 1 (map (comp :body)))}))
-
-#_ (echo (fetch-message2 {:token user-token
-                          :id "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvMDQyNDcwYTAtNzEwZC0xMWU3LWE2MjktODU3ZmYyMWQzYzQ5"}))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -292,9 +251,3 @@
              :oauth-token (or token access-token)
              :query-params {:email email}
              :channel (chan 1 (map (comp :items :body)))}))
-
-#_
-(echo (fetch-people {}))
-
-#_
-(echo (fetch-people {:email "patient2@sparkbot.io"}))
