@@ -5,33 +5,37 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.562"]
+                 [org.clojure/clojurescript "1.9.908"]
                  [org.clojure/core.async "0.3.443"]
                  [reagent "0.7.0"]
-                 [re-frame "0.9.4"]
+                 [re-frame "0.9.4"] ; is 0.10.2
                  [secretary "1.2.3"]
-                 [kioo "0.5.0-SNAPSHOT"
-                  :exclusions [cljsjs/react]]
+                 [kioo "0.5.0"
+                  :exclusions [cljsjs/react cljsjs/react-dom]]
                  [com.taoensso/timbre "4.10.0"]
                  [cljs-http "0.1.43"]
                  [camel-snake-kebab "0.4.0"]
-                 [cljsjs/material-ui "0.18.1-0"]
-                 [cljs-react-material-ui "0.2.44"
-                  :exclusions [cljsjs/material-ui cljsjs/react cljsjs/react-dom]]]
+                 [cljsjs/material-ui "0.19.2-0"] ;; tmp for react-material-ui
+                 [cljs-react-material-ui "0.2.48"
+                  :exclusions [cljsjs/material-ui
+                               org.clojure/clojure
+                               org.clojure/clojurescript]]]
 
-  :npm {:dependencies [[express "4.14.1"]
+  :npm {:dependencies [[~(symbol "@cljs-oss/module-deps") "1.1.1"] ;; required by cljs 1.9.908
+                       [express "4.16.0"]
                        [express-ws "2.0.0"]
                        [ws "0.8.0"]
                        [body-parser "1.14.1"]
                        [xmlhttprequest "1.8.0"]
                        [xmldom "0.1.27"]
                        [source-map-support "*"]
-                       [react "15.4.2"]
-                       [react-dom "15.4.2"]
+                       [react "16.0.0"]
+                       [react-dom "16.0.0"]
+                       [create-react-class "15.6.2"]
                        [ciscospark "1.4.0"]]
         :root :root}
 
-  :plugins [[lein-cljsbuild "1.1.6"]
+  :plugins [[lein-cljsbuild "1.1.7"]
             [lein-pprint "1.1.2"]
             [lein-npm "0.6.2"]]
 
@@ -70,13 +74,13 @@
 
   :profiles {:dev
              {:plugins
-              [[lein-figwheel "0.5.10"]
+              [[lein-figwheel "0.5.14"]
                [lein-doo "0.1.7"]]
               :dependencies
-              [[figwheel-sidecar "0.5.10"]
+              [[figwheel-sidecar "0.5.14"]
                [org.clojure/tools.namespace "0.2.11"]
                [org.clojure/tools.nrepl "0.2.12"]
-               [com.cemerick/piggieback "0.2.1"]
+               [com.cemerick/piggieback "0.2.2"]
                [proto-repl "0.3.1"]
                [proto-repl-charts "0.3.2"]]
               :figwheel {:http-server-root "public"
