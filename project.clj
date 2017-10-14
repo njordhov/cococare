@@ -7,6 +7,10 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.908"]
                  [org.clojure/core.async "0.3.443"]
+                 [cljsjs/react "15.6.2-0"]
+                 [cljsjs/react-dom "15.6.2-0"]
+                 [cljsjs/react-dom-server "15.6.2-0"]
+                 [cljsjs/create-react-class "15.6.2-0"]
                  [reagent "0.7.0"]
                  [re-frame "0.9.4"] ; is 0.10.2
                  [secretary "1.2.3"]
@@ -27,6 +31,7 @@
                        [ws "0.8.0"]
                        [body-parser "1.14.1"]
                        [xmlhttprequest "1.8.0"]
+                       [xhr2 "0.1.4"]
                        [xmldom "0.1.27"]
                        [source-map-support "*"]
                        [react "16.0.0"]

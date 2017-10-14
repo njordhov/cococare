@@ -34,16 +34,15 @@ but that doesn't seem to be the case, which may require additional concerns.
 ;; http://stackoverflow.com/questions/21839156/node-js-javascript-html-xmlhttprequest-cannot-load
 
 ;; Required for goog.net.XhrIo on node:
-
-(def xhr (nodejs/require "xmlhttprequest"))
-(when xhr
-  (set! js/XMLHttpRequest (.-XMLHttpRequest xhr)))
-
-;; checking out whether alternative xhr2 works avoids problems:
-#_
-(when-let [xhr (nodejs/require "xhr2")]
-  (let [Gen (.-XMLHttpRequest xhr)]
-    (set! js/XMLHttpRequest (Gen.))))
+(def xhr-module (#{"xhr2" "xmlhttprequest"} "xhr2"))
+(if-not (and (exists? js/XMLHttpRequest) js/XMLHttpRequest)
+  (if-let [xhr (nodejs/require xhr-module)]
+    (set! js/XMLHttpRequest
+      (case xhr-module
+        "xhr2" xhr
+        "xmlhttprequest" (.-XMLHttpRequest xhr)))
+    (println "ERROR: Missing xhr"))
+  (println "XHR already exists"))
 
 ;; really needed?
 #_
