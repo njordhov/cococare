@@ -12,7 +12,7 @@
    [re-frame.core :as rf]
    [secretary.core :as secretary
     :refer-macros [defroute]]
-   [app.messaging.facebook.fbme :as fbme])
+   [sdk.facebook.fbme :as fbme])
   (:import
    [goog History]))
 

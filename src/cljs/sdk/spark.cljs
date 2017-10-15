@@ -1,4 +1,4 @@
-(ns app.messaging.spark
+(ns sdk.spark
   (:require-macros
    [cljs.core.async.macros
     :refer [go go-loop]]

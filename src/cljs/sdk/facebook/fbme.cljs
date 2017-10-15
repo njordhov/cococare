@@ -1,4 +1,4 @@
-(ns app.messaging.facebook.fbme
+(ns sdk.facebook.fbme
   (:require-macros
     [cljs.core.async.macros :as m :refer [go go-loop alt!]])
   (:require

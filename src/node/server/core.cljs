@@ -12,9 +12,9 @@
     :refer [atom]]
    [app.core :as app
     :refer [static-page]]
-   [app.messaging.facebook.fbme :as fbme]
-   [app.messaging.facebook.messenger :as messenger]
-   [app.messaging.spark :as spark]
+   [sdk.facebook.fbme :as fbme]
+   [sdk.facebook.messenger :as messenger]
+   [sdk.spark :as spark]
    [server.fbhook :as fbhook]
    [server.infermedica :as infermedica]
    [server.db :as db]))

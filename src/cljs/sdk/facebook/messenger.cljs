@@ -1,4 +1,4 @@
-(ns app.messaging.facebook.messenger
+(ns sdk.facebook.messenger
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]])
   (:require

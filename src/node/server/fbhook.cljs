@@ -7,9 +7,9 @@
     :refer [chan close! <! timeout put!]]
    [cljs.nodejs :as nodejs]
    [taoensso.timbre :as timbre]
-   [app.messaging.facebook.fbme :as fbme]
-   [app.messaging.facebook.messenger :as messenger]
-   [app.messaging.spark :as spark]
+   [sdk.facebook.fbme :as fbme]
+   [sdk.facebook.messenger :as messenger]
+   [sdk.spark :as spark]
    [server.infermedica :as infermedica]
    [server.db :as db]))
 
