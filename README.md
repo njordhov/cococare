@@ -92,11 +92,11 @@ Make it a firehose by setting `event` and `resource` to "all".
 
 - Create a page on Facebook for your service.
 
+### Configuring Messenger
+
 From your [Facebook developer account](https://developers.facebook.com):
 
-- Create a new app and open its configuration page, then:
-
-### Configuring Messenger
+- Create a new facebook app and open its configuration page, then:
 
 #### Under *Products*
 
