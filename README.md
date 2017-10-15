@@ -98,30 +98,45 @@ From your [Facebook developer account](https://developers.facebook.com):
 
 ### Configuring Messenger
 
-- Under *Products* on the sidebar, add **Messenger** as product.
-- Under *Token Generation* select the created facebook page.
+#### Under *Products*
+
+- add **Messenger** as product.
+
+#### Under *Token Generation*
+
+- select the created facebook page.
 - Add the new access token as an environment var for the server:
 
     heroku config:set FACEBOOK_ACCESS_TOKEN=xxxxxx
 
-- Under *Webhooks* edit the events to enable "messages" only.
-- Select the page as subscriber to webhook events.
+#### Under *Webhooks*
 
-- Enable *Built-in NLP* which provides language analysis from [wit.ai](https://wit.ai)
-
-- Under *App Review* Select `pages_messaging` and `pages_messaging_subscriptions` then submit for review. Note: You may have to update the facebook page as requested.
-
-### Configuring the Messenger Webhook
-
-- Add a [webhook](https://developers.facebook.com/docs/messenger-platform/webhook-reference) "product" to handle messages for the app.
-- Set the type of the webhook to `page`.
-- Make sure your app is installed on heroku and up running, as the webhook on the server will be accessed by facebook to verify it.
+- First make sure your app is installed on heroku and up running, as the webhook on the server will be accessed by facebook to verify it.
+- Configure the facebook webhook *Callback Url* to point to `https://appname.herokuapp.com/fbme/webhook` where `appname` is the name of your app on heroku.
+- If the webhook fails to be accepted by facebook, troubleshoot as needed.
+- Set the facebook verify token to a complex string of your choice.
 - Set the facebook verify token var on the server to a string of your choice by executing in the terminal:
 
     heroku config:set FACEBOOK_VERIFY_TOKEN="some secret text"
 
-- Configure the facebook webhook *Callback Url* to point to `https://appname.herokuapp.com/fbme/webhook` where `appname` is the name of your app on heroku.
-- If the webhook fails to be accepted by facebook, troubleshoot as needed.
+- edit the subscription fields to enable "messages" only.
+- Verify and save the Webhooks dialog.
+- Select your page as subscriber to webhook events.
+
+#### Under *Built-in NLP*
+
+- Enable *Built-in NLP* which provides language analysis from [wit.ai](https://wit.ai)
+
+#### Under *App Review*
+
+- Select `pages_messaging` and `pages_messaging_subscriptions` then submit for review.
+- Note: You may have to update the facebook page as requested.
+
+### Configuring the Messenger Webhook
+
+- Select *WebHooks* on the drawer or:
+- Add a [webhook](https://developers.facebook.com/docs/messenger-platform/webhook-reference) "product" to handle messages for the app.
+- Set the type of the webhook to `page` as needed.
 
 ### Configuring the Chat Extension
 
@@ -133,7 +148,7 @@ Start a repl on heroku to execute configuration commands:
 
 - Evaluate to provide configuration commands:
 
-    (in-ns 'app.messaging.facebook.messenger)
+    (in-ns 'sdk.facebook.messenger)
 
 - Whitelist the domain of the server:
 
